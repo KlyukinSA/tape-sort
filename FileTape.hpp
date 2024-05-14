@@ -7,9 +7,9 @@
 
 class FileTape : public TapeInterface {
 private:
-    std::fstream& file;
+    std::fstream file;
 public:
-    FileTape(std::fstream& fileStream);
+    FileTape(std::string fileName, std::ios_base::openmode mode = std::ios::out);
     bool read(int& value) override;
     bool write(int value) override;
     bool rewind() override;

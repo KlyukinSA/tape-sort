@@ -2,13 +2,13 @@
 
 #include <iostream>
 
-FileTape::FileTape(std::fstream& fileStream):
-    file(fileStream) {}
+FileTape::FileTape(std::string fileName, std::ios_base::openmode mode):
+    file(std::fstream(fileName, std::ios::in | std::ios::out | mode)) {}
 
 bool FileTape::read(int& value) {
     std::streampos pos = file.tellg();
     file >> value;
-    // std::cout << value << ",\n";
+    // std::cout << "read" << value << ",\n";
     file.seekg(pos);
     return true;
 }
@@ -16,7 +16,7 @@ bool FileTape::read(int& value) {
 bool FileTape::write(int value) {
     std::streampos pos = file.tellg();
     file << value << ',';
-    // std::cout << value << ",\n";
+    // std::cout << "write" << value << ",\n";
     file.flush();
     file.seekg(pos);
     return true;
@@ -40,13 +40,18 @@ bool FileTape::shift(int n) {
         return true;
     } else {
         std::streampos start = file.tellg();
-        std::streampos cur = start;
-        while (cur > 0) {
-            cur -= 1;
-            file >> v >> c;
-            if (file.tellg() == start) {
-                file.seekg(cur);
-                return true;
+        for (int i = 0; i < n; i++) {
+            std::streampos cur = start;
+            while (cur > 0) {
+                cur -= 1;
+                file >> v >> c;
+                if (file.tellg() == start) {
+                    file.seekg(cur);
+                    start = cur;
+                    if (i == n - 1) {
+                        return true;
+                    }
+                }
             }
         }
         return false;

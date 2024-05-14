@@ -5,20 +5,18 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        // Вывести сообщение об использовании
+        std::cerr << "usage: ./prog input.txt output.txt\n";
         return 1;
     }
 
-    std::fstream inputFile;
-    inputFile.open(argv[1], std::ios::in);
-    std::fstream outputFile;
-    outputFile.open(argv[2]);
-    if (!outputFile.is_open())
+    // std::fstream inputFile;
+    // inputFile.open(argv[1]);
     {
-        outputFile.clear();
-        outputFile.open(argv[2], std::ios::out); // create file
-        outputFile.close();
-        outputFile.open(argv[2]);
+        std::fstream outputFile(argv[2]);
+        if (!outputFile.is_open()) {
+            outputFile.clear();
+            outputFile.open(argv[2], std::ios::out); // create file
+        }
     }
     // int i;
     // inputFile >> i;
@@ -29,7 +27,7 @@ int main(int argc, char* argv[]) {
     // inputFile >> i;
     // outputFile << i << '\n';
 
-    FileTape inputTape(inputFile);
+    FileTape inputTape{std::string(argv[1])};
     // inputTape.read(i);
     // std::cout << i << ' ';
     // inputTape.shift(1);
@@ -39,16 +37,15 @@ int main(int argc, char* argv[]) {
     // inputTape.read(i);
     // std::cout << i << '\n';
 
-    FileTape outputTape(outputFile);
+    FileTape outputTape{std::string(argv[2])};
     // outputTape.write(3);
     // outputTape.shift(1);
     // outputTape.write(4);
 
-    ExternalSorter sorter;
-    sorter.sort(inputTape, outputTape, 1000, 1000000); // Пример значений chunkSize и memoryLimit
-
-    inputFile.close();
-    outputFile.close();
+    int availableChunkSize = 7;
+    ExternalSorter sorter(availableChunkSize);
+    int groupSize = availableChunkSize / 2;
+    sorter.sort(inputTape, outputTape, groupSize);
 
     return 0;
 }

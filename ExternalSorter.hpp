@@ -10,7 +10,11 @@
 
 class ExternalSorter {
 public:
-    void sort(TapeInterface& inputTape, TapeInterface& outputTape, int chunkSize, int memoryLimit);
+    ExternalSorter(int chunkSize);
+    void sort(TapeInterface& inputTape, TapeInterface& outputTape, int tapeGroupSize);
+private:
+    std::vector<int> readChunk(TapeInterface& inputTape);
+    int chunkSize;
 };
 
 #endif

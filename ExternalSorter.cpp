@@ -162,7 +162,7 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
             if (!forward) {
                 shift = 0;
             }
-            FileTape tempTape(getTempTapeFileName(shift + tempTapeNumber), mode); // TODO opti: store in vector too
+            FileTape tempTape(getTempTapeFileName(shift + tempTapeNumber), mode); // TODO store in vector too
             // std::cout << "merge to " << shift + tempTapeNumber << '\n';
 
             int remain = mergeGroupToTape(group, tempTape);
@@ -172,7 +172,17 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
                 if (tempTapeNumber == 0) {
                     tempTapeNumber = tapeGroupSize;
                 }
-                std::cout << "resulting file - tmp/" << shift + tempTapeNumber - 1 << ".txt\n";
+                FileTape res(getTempTapeFileName(shift + tempTapeNumber - 1));
+                for (;;) {
+                    int val = 0;
+                    res.read(val);
+                    res.shift(1);
+                    if (res.isFinished()) {
+                        break;
+                    }
+                    outputTape.write(val);
+                    outputTape.shift(1);
+                }
                 return;
             }
             if (remain == 0) {

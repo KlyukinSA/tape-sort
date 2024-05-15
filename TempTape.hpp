@@ -13,8 +13,8 @@ private:
         return pos == size;
     }
 public:
-    TempTape(std::string fileName, std::ios_base::openmode mode = std::ios::out)
-        : tape(fileName, mode)
+    TempTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out)
+        : tape(fileName, config, mode)
         , pos(0)
         , size(0)
         , finished(false) 

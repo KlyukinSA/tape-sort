@@ -1,15 +1,18 @@
 #include "FileTape.hpp"
 
 #include <iostream>
+#include <unistd.h>
 
-FileTape::FileTape(std::string fileName, std::ios_base::openmode mode):
-    file(std::fstream(fileName, std::ios::in | std::ios::out | mode)) {
+FileTape::FileTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
+    : file(std::fstream(fileName, std::ios::in | std::ios::out | mode))
+    , config(config) {
     if (!file.is_open()) {
         std::cerr << "failed to open " << fileName << '\n';
     }
 }
 
 bool FileTape::read(int& value) {
+    usleep(config.readDelay);
     std::streampos pos = file.tellg();
     // std::cout << "read" << pos << ' ' << value << !file << ",\n";
     file >> value;
@@ -22,6 +25,7 @@ bool FileTape::read(int& value) {
 }
 
 bool FileTape::write(int value) {
+    usleep(config.writeDelay);
     file.clear();
     std::streampos pos = file.tellg();
     file << value << ',';
@@ -32,6 +36,7 @@ bool FileTape::write(int value) {
 }
 
 bool FileTape::rewind() {
+    usleep(config.rewindDelay);
     file.clear();
     file.seekg(0);
     return true;
@@ -40,6 +45,7 @@ bool FileTape::rewind() {
 bool FileTape::shift(int n) {
     int v;
     char c;
+    usleep(config.shiftDelay * n);
     if (n == 0) {
         return true;
     } else if (n > 0) {

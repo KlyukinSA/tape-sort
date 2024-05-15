@@ -1,6 +1,5 @@
 #include "ExternalSorter.hpp"
 
-#include "FileTape.hpp"
 #include "TempTape.hpp"
 
 #include <algorithm>
@@ -117,10 +116,10 @@ int mergeGroupToTape(std::vector<TempTape>& tempTapes, int srcShift, std::vector
     return remain;
 }
 
-void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, int tapeGroupSize) {
+void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, int tapeGroupSize, const FileTapeConfig& config) {
     std::vector<TempTape> tempTapes;
     for (int i = 0; i < 2 * tapeGroupSize; i++) {
-        tempTapes.push_back(TempTape(getTempTapeFileName(i), std::ios::trunc));
+        tempTapes.push_back(TempTape{getTempTapeFileName(i), config, std::ios::trunc});
     }
     int i = 0;
     int j = 0;

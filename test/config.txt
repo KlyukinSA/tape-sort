@@ -1,0 +1,6 @@
+readDelay=1 // microseconds
+d
+a= 1
+writeDelay=  2 1
+shiftDelay=3000
+rewindDelay=4000

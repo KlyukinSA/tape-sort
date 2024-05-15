@@ -13,59 +13,13 @@ private:
         return pos == size;
     }
 public:
-    TempTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out)
-        : tape(fileName, config, mode)
-        , pos(0)
-        , size(0)
-        , finished(false) 
-    {}
-    bool read(int& value) {
-        if (isFull()) {
-            value = 0;
-            finished = true;
-            return false;
-        } else {
-            // std::cout << "read temp "<< tape.isFinished() << ' ' << value << '\n';
-            bool res = tape.read(value);
-            // std::cout << "read temp "<< tape.isFinished() << ' ' << value << '\n';
-            return res;
-        }
-    }
-    bool write(int value) {
-        if (isFull()) {
-            size++;
-        }
-        finished = false;
-        return tape.write(value);
-    }
-    bool rewind() {
-        pos = 0;
-        finished = false;
-        return tape.rewind();
-    }
-    bool shift(int n) {
-        // std::cout << "(shift " << pos << ' ' << size << ')';
-        if (n < 0) {
-            finished = false;
-        } else if (n > 0) {
-            pos += n;
-            if (pos > size) {
-                n = size - (pos - n);
-                finished = true;
-                pos = size;
-            }
-        }
-        return tape.shift(n);
-    }
-    bool isFinished() {
-        return finished;
-    }
-    bool clean() {
-        pos = 0;
-        size = 0;
-        finished = false;
-        return tape.rewind();
-    }
+    TempTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out);
+    bool read(int& value);
+    bool write(int value);
+    bool rewind();
+    bool shift(int n);
+    bool isFinished();
+    bool clean();
 };
 
 #endif

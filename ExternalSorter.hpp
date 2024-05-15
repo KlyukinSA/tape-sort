@@ -7,8 +7,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <iostream>
-
 class ExternalSorter {
 public:
     ExternalSorter(int chunkSize);

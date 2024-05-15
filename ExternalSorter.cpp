@@ -1,21 +1,11 @@
 #include "ExternalSorter.hpp"
 
 #include "TempTape.hpp"
+#include "MergingTape.hpp"
 
 #include <algorithm>
 #include <vector>
 #include <fstream>
-
-// class MergingTape {
-// public:
-//     MergingTape(std::string fileName):
-//         tape(FileTape(fileName)) {}
-//     FileTape tape;
-// };
-struct MergingTape {
-    int prev;
-    int cur;
-};
 
 ExternalSorter::ExternalSorter(int chunkSize):
     chunkSize(chunkSize) {
@@ -39,80 +29,47 @@ std::vector<int> ExternalSorter::readChunk(TapeInterface& inputTape) {
     return res;
 }
 
-int mergeGroupToTape(std::vector<TempTape>::iterator tempTapes, std::vector<MergingTape>& group, TapeInterface& tape) {
-    // int val = 0;
-    // group[0].tape.read(val);
-    // std::cout << val << '\n';
+int mergeGroupToTape(std::vector<MergingTape>& group, TapeInterface& tape) {
     int remain = 0;
     for (std::size_t i = 0; i < group.size(); i++) {
-        if (!tempTapes[i].isFinished()) {
+        if (group[i].isIncreasing()) {
             remain++;
         }
     }
-    // if (remain == 0) {
-    //     return true;
-    // }
     while (true) {
         int min = 0;
         std::size_t pos = 0;
         bool wasIncrease = false;
-        // remain = 0;
         for (std::size_t i = 0; i < group.size(); i++) {
-            if (!tempTapes[i].isFinished()) {
-                // remain++;
-                // std::cout << "remain: " << remain << " i "  << i << '\n';
-                if (group[i].cur >= group[i].prev) {
-                    wasIncrease = true;
-                    min = group[i].cur;
-                    pos = i;
-                    break;
-                }
+            if (group[i].isIncreasing()) {
+                wasIncrease = true;
+                min = group[i].getCurrentValue();
+                pos = i;
+                break;
             }
         }
-        // if (remain == 0) {
-        //     return true;
-        // }
         if (!wasIncrease) {
             break;
         }
 
         for (std::size_t i = 0; i < group.size(); i++) {
-            int val = group[i].cur;
+            int val = group[i].getCurrentValue();
             // if (i == 2) std::cout << val << ' ';
-            if (!tempTapes[i].isFinished() && val >= group[i].prev && val < min) {
+            if (group[i].isIncreasing() && val < min) {
                 min = val;
                 pos = i;
             }
         }
 
         MergingTape& winner = group[pos];
-        tape.write(winner.cur);
+        tape.write(winner.getCurrentValue());
         tape.shift(1);
 
-        // std::cout << "group curs: ";
-        // for (int i = 0; i < group.size(); i++) {
-        //     std::cout << group[i].cur << ' ';
-        // }
-
-        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos].isFinished() << ' ';
-
-        // bool is = tempTapes[pos].isFinished();
-
-        int val = 0;
-        tempTapes[pos].read(val);
-        tempTapes[pos].shift(1);
-        winner.prev = winner.cur;
-        winner.cur = val;
-
-        // if (!is && tempTapes[pos].isFinished()) {
-        //     std::cout << pos << ' ' << winner.prev << ' ' << winner.cur << '\n';
-        // } 
-
-        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos].isFinished() << '\n';
+        winner.step();
     }
     // std::cout << "END GROUP\n";
     for (std::size_t i = 0; i < group.size(); i++) {
-        group[i].prev = 0;
+        group[i].startNewIncrease();
     }
     return remain;
 }
@@ -153,12 +110,7 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
         for (int i = 0; i < tapeGroupSize; i++) {
             int srcTapeNumber = srcShift + i;
             // std::cout << "merge from " << srcTapeNumber << '\n';
-            tempTapes[srcTapeNumber].rewind();
-            int val = 0;
-            tempTapes[srcTapeNumber].read(val);
-            // std::cout << srcTapeNumber << ' ' << val << ' ' << tempTapes[srcTapeNumber].isFinished() << '\n';
-            tempTapes[srcTapeNumber].shift(1);
-            group.push_back(MergingTape{0, val});
+            group.push_back(MergingTape{tempTapes[srcTapeNumber]});
         }
 
         i = 0;
@@ -177,14 +129,7 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
             }
             // std::cout << "merge to " << destTapeNumber << '\n';
 
-            // if (destTapeNumber == 1) {
-            //     for (int i = 0; i < tapeGroupSize; i++) {
-            //         int srcTapeNumber = srcShift + i;
-            //         std::cout << group[srcTapeNumber].cur << group[srcTapeNumber].prev << srcTapeNumber << tempTapes[srcTapeNumber].isFinished() << '\n';
-            //     }
-            //     // return;
-            // }
-            int remain = mergeGroupToTape(tempTapes.begin() + srcShift, group, tempTapes[destTapeNumber]);
+            int remain = mergeGroupToTape(group, tempTapes[destTapeNumber]);
 
             if (j == 1 && remain == 0) {
                 if (i == 0) {

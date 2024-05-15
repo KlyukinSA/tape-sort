@@ -38,13 +38,14 @@ std::vector<int> ExternalSorter::readChunk(TapeInterface& inputTape) {
     }
     return res;
 }
-int mergeGroupToTape(std::vector<TempTape>& tempTapes, int srcShift, std::vector<MergingTape>& group, TapeInterface& tape) {
+
+int mergeGroupToTape(std::vector<TempTape>::iterator tempTapes, std::vector<MergingTape>& group, TapeInterface& tape) {
     // int val = 0;
     // group[0].tape.read(val);
     // std::cout << val << '\n';
     int remain = 0;
     for (std::size_t i = 0; i < group.size(); i++) {
-        if (!tempTapes[i + srcShift].isFinished()) {
+        if (!tempTapes[i].isFinished()) {
             remain++;
         }
     }
@@ -57,7 +58,7 @@ int mergeGroupToTape(std::vector<TempTape>& tempTapes, int srcShift, std::vector
         bool wasIncrease = false;
         // remain = 0;
         for (std::size_t i = 0; i < group.size(); i++) {
-            if (!tempTapes[i + srcShift].isFinished()) {
+            if (!tempTapes[i].isFinished()) {
                 // remain++;
                 // std::cout << "remain: " << remain << " i "  << i << '\n';
                 if (group[i].cur >= group[i].prev) {
@@ -78,7 +79,7 @@ int mergeGroupToTape(std::vector<TempTape>& tempTapes, int srcShift, std::vector
         for (std::size_t i = 0; i < group.size(); i++) {
             int val = group[i].cur;
             // if (i == 2) std::cout << val << ' ';
-            if (!tempTapes[i + srcShift].isFinished() && val >= group[i].prev && val < min) {
+            if (!tempTapes[i].isFinished() && val >= group[i].prev && val < min) {
                 min = val;
                 pos = i;
             }
@@ -93,21 +94,21 @@ int mergeGroupToTape(std::vector<TempTape>& tempTapes, int srcShift, std::vector
         //     std::cout << group[i].cur << ' ';
         // }
 
-        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos + srcShift].isFinished() << ' ';
+        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos].isFinished() << ' ';
 
-        // bool is = tempTapes[pos + srcShift].isFinished();
+        // bool is = tempTapes[pos].isFinished();
 
         int val = 0;
-        tempTapes[pos + srcShift].read(val);
-        tempTapes[pos + srcShift].shift(1);
+        tempTapes[pos].read(val);
+        tempTapes[pos].shift(1);
         winner.prev = winner.cur;
         winner.cur = val;
 
-        // if (!is && tempTapes[pos + srcShift].isFinished()) {
+        // if (!is && tempTapes[pos].isFinished()) {
         //     std::cout << pos << ' ' << winner.prev << ' ' << winner.cur << '\n';
         // } 
 
-        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos + srcShift].isFinished() << '\n';
+        // std::cout << "winner " << pos << ' ' << winner.prev << ' ' << winner.cur << ' ' << tempTapes[pos].isFinished() << '\n';
     }
     // std::cout << "END GROUP\n";
     for (std::size_t i = 0; i < group.size(); i++) {
@@ -183,7 +184,7 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
             //     }
             //     // return;
             // }
-            int remain = mergeGroupToTape(tempTapes, srcShift, group, tempTapes[destTapeNumber]);
+            int remain = mergeGroupToTape(tempTapes.begin() + srcShift, group, tempTapes[destTapeNumber]);
 
             if (j == 1 && remain == 0) {
                 if (i == 0) {

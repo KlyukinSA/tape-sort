@@ -2,6 +2,7 @@
 #include "FileTape.hpp"
 
 #include <iostream>
+#include <utility>
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
@@ -9,17 +10,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    const char* configFileName = "test/config.txt";
-    std::ifstream configFile{configFileName};
-    if (!configFile.is_open()) {
-        std::cerr << "cant open " << configFileName << '\n';
-    }
-    FileTapeConfig config = readFileTapeConfigFromFile(configFile);
+    FileTapeConfig config = readFileTapeConfigFromFile(std::ifstream{"test/config.txt"});
 
-    {
-        std::fstream outputFile(argv[2], std::ios::out); // create file
+    std::fstream inputFile{argv[1]};
+    if (!inputFile.is_open()) {
+        std::cerr << "failed to open " << argv[1] << '\n';
+        return 2;
     }
-    FileTape inputTape{std::string(argv[1]), config};
+    FileTape inputTape{std::move(inputFile), config};
     // inputTape.read(i);
     // std::cout << i << ' ';
     // inputTape.shift(1);
@@ -29,7 +27,10 @@ int main(int argc, char* argv[]) {
     // inputTape.read(i);
     // std::cout << i << '\n';
 
-    FileTape outputTape{std::string(argv[2]), config};
+    {
+        std::fstream outputFile(argv[2], std::ios::out); // create file
+    }
+    FileTape outputTape{std::fstream{std::string(argv[2])}, config};
     // outputTape.write(3);
     // outputTape.shift(1);
     // outputTape.write(4);

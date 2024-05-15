@@ -13,7 +13,7 @@ private:
         return pos == size;
     }
 public:
-    TempTape(const std::string& fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out);
+    TempTape(FileTape&& tape);
     bool read(int& value);
     bool write(int value);
     bool rewind();

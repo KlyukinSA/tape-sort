@@ -1,17 +1,12 @@
 #include "FileTape.hpp"
 
 #include <unistd.h>
-#include <stdexcept>
-#include <string>
+#include <utility>
 
-FileTape::FileTape(const std::string& fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
-    : file(std::fstream(fileName, std::ios::in | std::ios::out | mode))
+FileTape::FileTape(std::fstream&& file, const FileTapeConfig& config)
+    : file(std::move(file))
     , config(config)
-{
-    if (!file.is_open()) {
-        throw std::runtime_error(std::string{"failed to open "} + fileName);
-    }
-}
+{}
 
 bool FileTape::read(int& value) {
     usleep(config.readDelay);

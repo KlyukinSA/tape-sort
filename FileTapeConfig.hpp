@@ -10,6 +10,6 @@ struct FileTapeConfig {
     int rewindDelay;
 };
 
-FileTapeConfig readFileTapeConfigFromFile(std::ifstream& file);
+FileTapeConfig readFileTapeConfigFromFile(std::ifstream&& file);
 
 #endif

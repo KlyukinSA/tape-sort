@@ -3,7 +3,7 @@
 #include "lib/microtest.h"
 
 TEST(ExampleSucceedingTest) {
-    FileTape tape("file_tape.txt", FileTapeConfig{0,0,0,0}, std::ios::trunc);
+    FileTape tape(std::fstream{"file_tape.txt", std::ios::in | std::ios::out | std::ios::trunc}, FileTapeConfig{0,0,0,0});
     tape.write(2);
     tape.shift(1);
     tape.write(3);

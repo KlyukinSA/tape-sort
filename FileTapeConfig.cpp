@@ -18,7 +18,7 @@ static void store_line(FileTapeConfig& res, std::string key, std::string value) 
     }
 }
 
-FileTapeConfig readFileTapeConfigFromFile(std::ifstream& file) {
+FileTapeConfig readFileTapeConfigFromFile(std::ifstream&& file) {
     FileTapeConfig res{0, 0, 0, 0};
     std::string line;
     while (std::getline(file, line)) {

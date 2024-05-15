@@ -1,7 +1,9 @@
 #include "TempTape.hpp"
 
-TempTape::TempTape(const std::string& fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
-    : tape(fileName, config, mode)
+#include <utility>
+
+TempTape::TempTape(FileTape&& tape)
+    : tape(std::move(tape))
     , pos(0)
     , size(0)
     , finished(false) 

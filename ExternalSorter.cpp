@@ -91,7 +91,7 @@ static void writeResult(TapeInterface& resultTape, TapeInterface& outputTape) {
 void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, int tapeGroupSize, const FileTapeConfig& config) {
     std::vector<TempTape> tempTapes;
     for (int i = 0; i < 2 * tapeGroupSize; i++) {
-        tempTapes.push_back(TempTape{getTempTapeFileName(i), config, std::ios::trunc});
+        tempTapes.push_back(TempTape{FileTape{std::fstream{getTempTapeFileName(i), std::ios::in | std::ios::out | std::ios::trunc}, config}});
     }
     int i = 0;
     int j = 0;

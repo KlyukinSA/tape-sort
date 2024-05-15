@@ -1,6 +1,6 @@
 #include "TempTape.hpp"
 
-TempTape::TempTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
+TempTape::TempTape(const std::string& fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
     : tape(fileName, config, mode)
     , pos(0)
     , size(0)

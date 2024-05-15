@@ -11,7 +11,7 @@ private:
     std::fstream file;
     const FileTapeConfig& config;
 public:
-    FileTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out);
+    FileTape(const std::string& fileName, const FileTapeConfig& config, std::ios_base::openmode mode = std::ios::out);
     bool read(int& value) override;
     bool write(int value) override;
     bool rewind() override;

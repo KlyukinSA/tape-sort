@@ -8,3 +8,6 @@ prog: main.o ExternalSorter.o FileTape.o
 	$(CXX) $^ -o $@
 
 all: prog
+
+clean:
+	rm *.o prog

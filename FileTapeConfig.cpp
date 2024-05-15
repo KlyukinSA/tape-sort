@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 
-void store_line(FileTapeConfig& res, std::string key, std::string value) {
+static void store_line(FileTapeConfig& res, std::string key, std::string value) {
     // std::istringstream is_val(value);
     int val = std::stoi(value);
     // is_val >> val;
@@ -19,11 +19,7 @@ void store_line(FileTapeConfig& res, std::string key, std::string value) {
 }
 
 FileTapeConfig readFileTapeConfigFromFile(std::ifstream& file) {
-    FileTapeConfig res;
-    res.readDelay = 0;
-    res.writeDelay = 0;
-    res.shiftDelay = 0;
-    res.rewindDelay = 0;
+    FileTapeConfig res{0, 0, 0, 0};
     std::string line;
     while (std::getline(file, line)) {
         std::istringstream is_line(line);

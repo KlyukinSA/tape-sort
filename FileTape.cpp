@@ -5,7 +5,8 @@
 
 FileTape::FileTape(std::string fileName, const FileTapeConfig& config, std::ios_base::openmode mode)
     : file(std::fstream(fileName, std::ios::in | std::ios::out | mode))
-    , config(config) {
+    , config(config)
+{
     if (!file.is_open()) {
         std::cerr << "failed to open " << fileName << '\n';
     }

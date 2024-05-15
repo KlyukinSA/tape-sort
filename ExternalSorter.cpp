@@ -7,9 +7,9 @@
 #include <vector>
 #include <fstream>
 
-ExternalSorter::ExternalSorter(int chunkSize):
-    chunkSize(chunkSize) {
-}
+ExternalSorter::ExternalSorter(int chunkSize)
+    : chunkSize(chunkSize)
+{}
 
 static std::string getTempTapeFileName(int id) {
     return "tmp/" + std::to_string(id) + ".txt";
@@ -29,7 +29,7 @@ std::vector<int> ExternalSorter::readChunk(TapeInterface& inputTape) {
     return res;
 }
 
-int mergeGroupToTape(std::vector<MergingTape>& group, TapeInterface& tape) {
+static int mergeGroupToTape(std::vector<MergingTape>& group, TapeInterface& tape) {
     int remain = 0;
     for (std::size_t i = 0; i < group.size(); i++) {
         if (group[i].isIncreasing()) {
@@ -72,6 +72,20 @@ int mergeGroupToTape(std::vector<MergingTape>& group, TapeInterface& tape) {
         group[i].startNewIncrease();
     }
     return remain;
+}
+
+static void writeResult(TapeInterface& resultTape, TapeInterface& outputTape) {
+    resultTape.rewind();
+    for (;;) {
+        int val = 0;
+        resultTape.read(val);
+        resultTape.shift(1);
+        if (resultTape.isFinished()) {
+            break;
+        }
+        outputTape.write(val);
+        outputTape.shift(1);
+    }
 }
 
 void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, int tapeGroupSize, const FileTapeConfig& config) {
@@ -135,18 +149,7 @@ void ExternalSorter::sort(TapeInterface& inputTape, TapeInterface& outputTape, i
                 if (i == 0) {
                     i = tapeGroupSize;
                 }
-                int resultTapeNumber = shift + i - 1;
-                tempTapes[resultTapeNumber].rewind();
-                for (;;) {
-                    int val = 0;
-                    tempTapes[resultTapeNumber].read(val);
-                    tempTapes[resultTapeNumber].shift(1);
-                    if (tempTapes[resultTapeNumber].isFinished()) {
-                        break;
-                    }
-                    outputTape.write(val);
-                    outputTape.shift(1);
-                }
+                writeResult(tempTapes[shift + i - 1], outputTape);
                 return;
             }
             j++;

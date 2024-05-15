@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     // outputTape.write(4);
 
     int availableChunkSize = 7;
-    ExternalSorter sorter(availableChunkSize);
+    ExternalSorter sorter{availableChunkSize};
     int groupSize = 3;
     sorter.sort(inputTape, outputTape, groupSize, config);
 

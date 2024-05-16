@@ -2,18 +2,23 @@
 
 #include "lib/microtest.h"
 
-int pos = 0;
-int size = 0;
-const int cap = 8;
-int array[cap];
-bool finished = false;
+class MockTape : public TapeInterface {
+private:
+    int pos = 0;
+    int size = 0;
+    static const int cap = 8;
+    int array[cap];
+    bool finished = false;
+public:
+    MockTape() {};
+    bool read(int& value) override;
+    bool write(int value) override;
+    bool rewind() override;
+    bool shift(int n) override;
+    bool isFinished() override;
+};
 
-FileTape::FileTape(std::fstream&& file, const FileTapeConfig& config)
-    : file(std::move(file))
-    , config(config)
-{}
-
-bool FileTape::read(int& value) {
+bool MockTape::read(int& value) {
     if (pos == size) {
         finished = true;
         value = 0;
@@ -23,7 +28,7 @@ bool FileTape::read(int& value) {
     return true;
 }
 
-bool FileTape::write(int value) {
+bool MockTape::write(int value) {
     array[pos] = value;
     if (pos == size) {
         size++;
@@ -31,12 +36,12 @@ bool FileTape::write(int value) {
     return true;
 }
 
-bool FileTape::rewind() {
+bool MockTape::rewind() {
     pos = 0;
     return true;
 }
 
-bool FileTape::shift(int n) {
+bool MockTape::shift(int n) {
     if (n == 0) {
         return true;
     } else if (n > 0) {
@@ -56,12 +61,12 @@ bool FileTape::shift(int n) {
     return true;
 }
 
-bool FileTape::isFinished() {
+bool MockTape::isFinished() {
     return finished;
 }
 
 TEST(ExampleSucceedingTest) {
-    TempTape tape{FileTape{std::fstream{}, FileTapeConfig{}}};
+    TempTape<MockTape> tape{MockTape{}};
     // as usual tape
     tape.write(1112);
     tape.shift(1);

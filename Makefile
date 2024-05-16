@@ -4,7 +4,7 @@ CXXFLAGS = -Wall
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-prog: main.o ExternalSorter.o FileTape.o FileTapeConfig.o TempTape.o MergingTape.o
+prog: main.o FileTape.o FileTapeConfig.o MergingTape.o FileTapeFactory.o
 	$(CXX) $^ -o $@
 
 all: prog

@@ -1,5 +1,6 @@
 #include "ExternalSorter.hpp"
 #include "FileTape.hpp"
+#include "FileTapeFactory.hpp"
 
 #include <iostream>
 #include <utility>
@@ -18,27 +19,18 @@ int main(int argc, char* argv[]) {
         return 2;
     }
     FileTape inputTape{std::move(inputFile), config};
-    // inputTape.read(i);
-    // std::cout << i << ' ';
-    // inputTape.shift(1);
-    // inputTape.read(i);
-    // std::cout << i << '\n';
-    // inputTape.rewind();
-    // inputTape.read(i);
-    // std::cout << i << '\n';
 
     {
         std::fstream outputFile(argv[2], std::ios::out); // create file
     }
     FileTape outputTape{std::fstream{std::string(argv[2])}, config};
-    // outputTape.write(3);
-    // outputTape.shift(1);
-    // outputTape.write(4);
 
     int availableChunkSize = 7;
-    ExternalSorter sorter{availableChunkSize};
+    ExternalSorter<FileTape> sorter{availableChunkSize};
+
     int groupSize = 3;
-    sorter.sort(inputTape, outputTape, groupSize, config);
+    FileTapeFactory factory{config, "tmp"};
+    sorter.sort(inputTape, outputTape, groupSize, factory);
 
     return 0;
 }

@@ -2,21 +2,42 @@
 
 #include <unistd.h>
 #include <utility>
+#include <limits>
+#include <iostream>
 
 FileTape::FileTape(std::fstream&& file, const FileTapeConfig& config)
     : file(std::move(file))
     , config(config)
 {}
 
+bool FileTape::step(int& v) {
+    char c;
+    while (true) {
+        file >> v;
+        if (!file) {
+            file.clear();
+            file >> c;
+            if (!file) {
+                v = 0;
+                return false;
+            }
+        } else {
+            break;
+        }
+    }
+    std::streampos pos = file.tellg();
+    file >> c;
+    if (std::isdigit(c)) {
+        file.seekg(pos);
+    }
+    file.clear();
+    return true;
+}
+
 bool FileTape::read(int& value) {
     usleep(config.readDelay);
     std::streampos pos = file.tellg();
-    // std::cout << "read" << pos << ' ' << value << !file << ",\n";
-    file >> value;
-    if (!file) {
-        value = 0;
-    }
-    // std::cout << "read" << pos << ' ' << value << !file << ",\n";
+    step(value);
     file.seekg(pos);
     return true;
 }
@@ -26,7 +47,6 @@ bool FileTape::write(int value) {
     file.clear();
     std::streampos pos = file.tellg();
     file << value << ',';
-    // std::cout << "write" << value << ",\n";
     file.flush();
     file.seekg(pos);
     return true;
@@ -41,14 +61,12 @@ bool FileTape::rewind() {
 
 bool FileTape::shift(int n) {
     int v;
-    char c;
     usleep(config.shiftDelay * n);
     if (n == 0) {
         return true;
     } else if (n > 0) {
         for (int i = 0; i < n; i++) {
-            file >> v >> c;
-            // std::cout << '\n' << v << c << '\n';
+            step(v);
         }
         return true;
     } else {
@@ -59,7 +77,7 @@ bool FileTape::shift(int n) {
             while (cur > 0) {
                 cur -= 1;
                 file.seekg(cur);
-                file >> v >> c;
+                step(v);
                 if (file.tellg() == start) {
                     start = cur;
                     if (i == n - 1) {

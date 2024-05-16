@@ -15,6 +15,8 @@ public:
     bool shift(int n) override;
     bool isFinished() override;
 private:
+    bool step(int& v);
+
     std::fstream file;
     const FileTapeConfig& config;
 };

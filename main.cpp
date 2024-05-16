@@ -25,12 +25,23 @@ int main(int argc, char* argv[]) {
     }
     FileTape outputTape{std::fstream{std::string(argv[2])}, config};
 
-    int availableChunkSize = 7;
+    int N, M;
+    if (argc > 4) {
+        N = std::atoi(argv[3]);
+        M = std::atoi(argv[4]);
+    } else {
+        N = 3 * 7 * 2;
+        M = 7 * sizeof(int);
+    }
+    int availableChunkSize = M / sizeof(int);
     ExternalSorter<FileTape> sorter{availableChunkSize};
 
-    int groupSize = 3;
+    int chunksAmount = N / availableChunkSize;
+    if (chunksAmount < 4) {
+        chunksAmount = 4;
+    }
     FileTapeFactory factory{config, "tmp"};
-    sorter.sort(inputTape, outputTape, groupSize, factory);
+    sorter.sort(inputTape, outputTape, chunksAmount / 2, factory);
 
     return 0;
 }

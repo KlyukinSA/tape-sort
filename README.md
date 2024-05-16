@@ -12,3 +12,7 @@ g++ TempTapeTest.cpp && ./a.out
 g++ FileTapeTest.cpp ../FileTape.cpp && ./a.out
 g++ config.cpp ../FileTapeConfig.cpp && ./a.out
 ```
+
+По умолчанию N = 42 (числа), M = 28 (байт). Если указать 3-им параметром N и 4-ым M то они зададутся.
+
+`./prog test/input2.txt test/output.txt 42 28`

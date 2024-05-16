@@ -7,9 +7,6 @@
 #include <fstream>
 
 class FileTape : public TapeInterface {
-private:
-    std::fstream file;
-    const FileTapeConfig& config;
 public:
     FileTape(std::fstream&& file, const FileTapeConfig& config);
     bool read(int& value) override;
@@ -17,6 +14,9 @@ public:
     bool rewind() override;
     bool shift(int n) override;
     bool isFinished() override;
+private:
+    std::fstream file;
+    const FileTapeConfig& config;
 };
 
 #endif

@@ -7,13 +7,6 @@
 
 template<class T>
 class TempTape : public TapeInterface {
-private:
-    bool isFull();
-
-    T tape;
-    int pos;
-    int size;
-    bool finished;
 public:
     TempTape(T&& tape);
     bool read(int& value);
@@ -22,12 +15,14 @@ public:
     bool shift(int n);
     bool isFinished();
     bool clean();
-};
+private:
+    bool isFull();
 
-template<class T>
-bool TempTape<T>::isFull() {
-    return pos == size;
-}
+    T tape;
+    int pos;
+    int size;
+    bool finished;
+};
 
 template<class T>
 TempTape<T>::TempTape(T&& tape)
@@ -91,6 +86,11 @@ bool TempTape<T>::clean() {
     size = 0;
     finished = false;
     return tape.rewind();
+}
+
+template<class T>
+bool TempTape<T>::isFull() {
+    return pos == size;
 }
 
 #endif

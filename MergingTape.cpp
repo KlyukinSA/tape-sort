@@ -1,8 +1,10 @@
 #include "MergingTape.hpp"
 
+#include <limits>
+
 MergingTape::MergingTape(TapeInterface& tape)
     : tape(tape)
-    , cur(0)
+    , cur(std::numeric_limits<int>::min())
 {
     tape.rewind();
     step();
@@ -25,5 +27,5 @@ void MergingTape::step() {
 }
 
 void MergingTape::startNewIncrease() {
-    prev = 0;
+    prev = std::numeric_limits<int>::min();
 }

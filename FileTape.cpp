@@ -1,9 +1,8 @@
 #include "FileTape.hpp"
 
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 #include <utility>
-#include <limits>
-#include <iostream>
 
 FileTape::FileTape(std::fstream&& file, const FileTapeConfig& config)
     : file(std::move(file))
@@ -35,7 +34,7 @@ bool FileTape::step(int& v) {
 }
 
 bool FileTape::read(int& value) {
-    usleep(config.readDelay);
+    std::this_thread::sleep_for(std::chrono::microseconds(config.readDelay));
     std::streampos pos = file.tellg();
     step(value);
     file.seekg(pos);
@@ -43,7 +42,7 @@ bool FileTape::read(int& value) {
 }
 
 bool FileTape::write(int value) {
-    usleep(config.writeDelay);
+    std::this_thread::sleep_for(std::chrono::microseconds(config.writeDelay));
     file.clear();
     std::streampos pos = file.tellg();
     file << value << ',';
@@ -53,7 +52,7 @@ bool FileTape::write(int value) {
 }
 
 bool FileTape::rewind() {
-    usleep(config.rewindDelay);
+    std::this_thread::sleep_for(std::chrono::microseconds(config.rewindDelay));
     file.clear();
     file.seekg(0);
     return true;
@@ -61,7 +60,7 @@ bool FileTape::rewind() {
 
 bool FileTape::shift(int n) {
     int v;
-    usleep(config.shiftDelay * n);
+    std::this_thread::sleep_for(std::chrono::microseconds(config.shiftDelay * n));
     if (n == 0) {
         return true;
     } else if (n > 0) {
